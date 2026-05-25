@@ -18,38 +18,6 @@ A full-stack application built with **Java Spring Boot**, **MySQL**, and **React
 
 ---
 
-## Project Structure
-
-```
-student-course-mgmt/
-├── database/
-│   └── schema.sql                   ← Full schema + stored procedures + seed data
-├── backend/
-│   ├── pom.xml
-│   └── src/main/java/com/scm/
-│       ├── entity/                  ← JPA entities (Course, Student, User, Role)
-│       ├── dto/                     ← Request/Response DTOs
-│       ├── repository/              ← Spring Data JPA repositories
-│       ├── service/                 ← Business logic
-│       ├── controller/              ← REST controllers
-│       ├── security/                ← JWT utils, filters, UserDetailsService
-│       ├── config/                  ← SecurityConfig + CORS
-│       └── exception/               ← Global exception handler
-└── frontend/
-    ├── index.html
-    └── src/
-        ├── App.jsx                  ← Router + protected routes
-        ├── context/AuthContext.jsx  ← Global auth state
-        ├── services/api.js          ← Axios API calls
-        ├── components/Layout.jsx    ← Sidebar + navigation
-        └── pages/
-            ├── LoginPage.jsx
-            ├── Dashboard.jsx        ← Also contains CoursesPage, StudentsPage, ProfilePage
-            └── (other pages)
-```
-
----
-
 ## Database Design
 
 ### Tables
@@ -121,20 +89,6 @@ Each procedure uses `START TRANSACTION` / `COMMIT` / `ROLLBACK` for data integri
 | POST   | /api/students                 | Admin   | Create student (via stored proc)|
 | PUT    | /api/students/:id             | Admin   | Update student (via stored proc)|
 | DELETE | /api/students/:id?force=bool  | Admin   | Delete student                 |
-
----
-
-## Roles & Permissions
-
-| Operation           | ROLE_ADMIN | ROLE_STUDENT |
-|---------------------|:----------:|:------------:|
-| View all students   | ✅         | ❌           |
-| View own profile    | ✅         | ✅           |
-| Create student      | ✅         | ❌           |
-| Update student      | ✅         | ❌           |
-| Delete student      | ✅         | ❌           |
-| View all courses    | ✅         | ✅           |
-| Manage courses      | ✅         | ❌           |
 
 ---
 
@@ -240,14 +194,3 @@ Authorization: Bearer <admin_token>
 DELETE /api/students/1?force=false    ← fails if enrolled
 DELETE /api/students/1?force=true     ← force deletes
 ```
-
----
-
-## Key Implementation Details
-
-- **Stored Procedures**: Create, Update, Delete operations on students use MySQL stored procedures called via JPA `EntityManager`
-- **Transaction Safety**: All stored procedures use `START TRANSACTION` / `ROLLBACK` on errors
-- **JWT Auth**: Stateless authentication, tokens expire in 24 hours
-- **CORS**: Configured for `localhost:3000` and `localhost:5173`
-- **Validation**: Bean Validation annotations on all DTOs with global error handler
-- **Cascade Behavior**: Student `course_id` uses `SET NULL` on course delete (not hard cascade)
